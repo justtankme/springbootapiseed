@@ -1,0 +1,5 @@
+[2018-01-20 18:51:27.611] [ INFO] [Thread-9] AnnotationConfigEmbeddedWebApplicationContext Closing org.springframework.boot.context.embedded.AnnotationConfigEmbeddedWebApplicationContext@12581661: startup date [Sat Jan 20 18:35:38 CST 2018]; root of context hierarchy
+[2018-01-20 18:51:27.614] [ INFO] [Thread-9] DefaultLifecycleProcessor Stopping beans in phase 2147483647
+[2018-01-20 18:51:27.616] [ INFO] [Thread-9] AnnotationMBeanExporter Unregistering JMX-exposed beans on shutdown
+[2018-01-20 18:51:27.616] [ INFO] [Thread-9] AnnotationMBeanExporter Unregistering JMX-exposed beans
+[2018-01-20 18:51:27.627] [ INFO] [Thread-9] DruidDataSource {dataSource-1} closed

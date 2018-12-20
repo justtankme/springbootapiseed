@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+-scan:当此属性设置为true时，配置文件如果发生改变，将会被重新加载，默认值为true
+-scanPeriod:设置监测配置文件是否有修改的时间间隔，如果没有给出时间单位，默认单位是毫秒。
+-           当scan为true时，此属性生效。默认的时间间隔为1分钟
+-debug:当此属性设置为true时，将打印出logback内部日志信息，实时查看logback运行状态。默认值为false。
+-
+- configuration 子节点为 appender、logger、root
+-->
+<configuration scan="true" scanPeriod="60 second" debug="false">
+    <property name="BasePath" value="${catalina.home}/logs/company" />
+    <property name="DebugLogName" value="project-debug" />
+    <property name="InfoLogName" value="project-info" />
+    <property name="ErrorLogName" value="project-error" />
+ 
+    <!-- 负责写日志,控制台日志 -->
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <!-- 一是把日志信息转换成字节数组,二是把字节数组写入到输出流 -->
+        <encoder>
+            <Pattern>[%d{yyyy-MM-dd HH:mm:ss.SSS}] [%5level] [%thread] %logger{0} %msg%n</Pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+ 
+    <!-- 文件日志 -->
+    <appender name="DebugAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${BasePath}/${DebugLogName}.log</file>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>DEBUG</level>
+        </filter>
+        <encoder>
+            <Pattern>[%d{yyyy-MM-dd HH:mm:ss.SSS}] [%5level] [%thread] %logger{0} %msg%n</Pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${BasePath}/${DebugLogName}.%d{yyyyMMdd}.%i.log</fileNamePattern>
+            <!-- each file should be at most 10MB -->
+            <maxFileSize>20KB</maxFileSize>
+            <!-- keep 30 days' worth of history capped at 3GB total size -->
+            <maxHistory>30</maxHistory>
+            <!-- controls the total size of all archive files. 
+            Oldest archives are deleted asynchronously when the total size cap is exceeded.
+            the "max history" restriction is always applied first then the "total size cap" -->
+            <totalSizeCap>10GB</totalSizeCap>
+        </rollingPolicy>
+    </appender>
+ 
+    <!-- 滚动记录文件，先将日志记录到指定文件，当符合某个条件时，将日志记录到其他文件 -->
+    <appender name="InfoAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${BasePath}/${InfoLogName}.log</file>
+        <!-- ThresholdFilter:临界值过滤器，过滤掉 TRACE 和 DEBUG 级别的日志 -->
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>INFO</level>
+        </filter>
+        <encoder>
+            <Pattern>[%d{yyyy-MM-dd HH:mm:ss.SSS}] [%5level] [%thread] %logger{0} %msg%n</Pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${BasePath}/${InfoLogName}.%d{yyyyMMdd}.%i.log</fileNamePattern>
+            <!-- each file should be at most 10MB -->
+            <maxFileSize>20KB</maxFileSize>
+            <!-- keep 30 days' worth of history capped at 3GB total size -->
+            <maxHistory>30</maxHistory>
+            <!-- controls the total size of all archive files. 
+            Oldest archives are deleted asynchronously when the total size cap is exceeded.
+            the "max history" restriction is always applied first then the "total size cap" -->
+            <totalSizeCap>10GB</totalSizeCap>
+        </rollingPolicy>
+    </appender >
+    
+    <!-- 滚动记录文件，先将日志记录到指定文件，当符合某个条件时，将日志记录到其他文件 -->
+    <appender name="ErrorAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${BasePath}/${ErrorLogName}.log</file>
+        <!-- ThresholdFilter:临界值过滤器，过滤掉 TRACE 和 DEBUG 级别的日志 -->
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>ERROR</level>
+        </filter>
+        <encoder>
+            <Pattern>[%d{yyyy-MM-dd HH:mm:ss.SSS}] [%5level] [%thread] %logger{0} %msg%n</Pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${BasePath}/${ErrorLogName}.%d{yyyyMMdd}.%i.log</fileNamePattern>
+            <!-- each file should be at most 10MB -->
+            <maxFileSize>20KB</maxFileSize>
+            <!-- keep 30 days' worth of history capped at 3GB total size -->
+            <maxHistory>30</maxHistory>
+            <!-- controls the total size of all archive files. 
+            Oldest archives are deleted asynchronously when the total size cap is exceeded.
+            the "max history" restriction is always applied first then the "total size cap" -->
+            <totalSizeCap>10GB</totalSizeCap>
+        </rollingPolicy>
+    </appender >
+ 
+   <!--  <appender name="ERROR" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>error.log</file>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>ERROR</level>
+        </filter>
+        <encoder>
+            <Pattern>[%d{yyyy-MM-dd HH:mm:ss.SSS}] [%5level] [%thread] %logger{0} %msg%n</Pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            每天生成一个日志文件，保存30天的日志文件
+            - 如果隔一段时间没有输出日志，前面过期的日志不会被删除，只有再重新打印日志的时候，会触发删除过期日志的操作。
+           
+            <fileNamePattern>info.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+            <TimeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>100MB</maxFileSize>
+            </TimeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+    </appender> -->
+ 
+	<springProfile name="dev">
+	   <!-- additivity 设为false 则符合本logger的日志不记录到其他继承树中更高层级的logger中 -->
+		<logger name="com.company" level="DEBUG" additivity="false">
+	        <appender-ref ref="STDOUT" />
+	    </logger>
+	    <!-- <logger name="com.ibatis" level="INFO" additivity="false"/>
+	    <logger name="com.ibatis.common.jdbc.SimpleDataSource" level="INFO" additivity="false"/>
+	    <logger name="com.ibatis.common.jdbc.ScriptRunner" level="INFO" additivity="false"/>
+	    <logger name="com.ibatis.sqlmap.engine.impl.SqlMapClientDelegate" level="INFO" additivity="false"/>
+	    <logger name="java.sql.Connection" level="INFO" additivity="false"/> -->
+	    <logger name="java.sql.Statement" level="DEBUG" additivity="false">
+	        <appender-ref ref="STDOUT" />
+	    </logger>
+	    <logger name="java.sql.PreparedStatement" level="DEBUG" additivity="false">
+	        <appender-ref ref="STDOUT" />
+	    </logger>
+        <root level="DEBUG">
+            <appender-ref ref="STDOUT" />
+        </root>
+	</springProfile>
+	
+   <springProfile name="prod">
+	   <!-- additivity 设为false 则符合本logger的日志不记录到其他继承树中更高层级的logger中 -->
+		<logger name="com.company" level="INFO" additivity="false">
+	        <appender-ref ref="InfoAppender" />
+	        <appender-ref ref="ErrorAppender" />
+	    </logger>
+	    <!-- <logger name="com.ibatis" level="INFO" additivity="false"/>
+	    <logger name="com.ibatis.common.jdbc.SimpleDataSource" level="INFO" additivity="false"/>
+	    <logger name="com.ibatis.common.jdbc.ScriptRunner" level="INFO" additivity="false"/>
+	    <logger name="com.ibatis.sqlmap.engine.impl.SqlMapClientDelegate" level="INFO" additivity="false"/>
+	    <logger name="java.sql.Connection" level="INFO" additivity="false"/> -->
+	    <logger name="java.sql.Statement" level="INFO" additivity="false">
+	        <appender-ref ref="InfoAppender" />
+	        <appender-ref ref="ErrorAppender" />
+	    </logger>
+	    <logger name="java.sql.PreparedStatement" level="INFO" additivity="false">
+	        <appender-ref ref="InfoAppender" />
+	        <appender-ref ref="ErrorAppender" />
+	    </logger>
+        <root level="INFO">
+            <appender-ref ref="InfoAppender" />
+	        <appender-ref ref="ErrorAppender" />
+        </root>
+	</springProfile>
+</configuration>
