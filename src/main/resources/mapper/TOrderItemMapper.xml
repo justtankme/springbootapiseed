@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.company.project.dao.TOrderItemMapper">
+  <resultMap id="BaseResultMap" type="com.company.project.domain.model.TOrderItem">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="order_item_id" jdbcType="INTEGER" property="orderItemId" />
+    <result column="order_id" jdbcType="INTEGER" property="orderId" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="order_content" jdbcType="VARCHAR" property="orderContent" />
+    <result column="user_id" jdbcType="INTEGER" property="userId" />
+  </resultMap>
+</mapper>

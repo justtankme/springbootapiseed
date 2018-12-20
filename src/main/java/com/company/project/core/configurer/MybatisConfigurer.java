@@ -4,8 +4,6 @@ import static com.company.project.core.common.ProjectConstant.MAPPER_INTERFACE_R
 import static com.company.project.core.common.ProjectConstant.MAPPER_PACKAGE;
 import static com.company.project.core.common.ProjectConstant.MODEL_PACKAGE;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Properties;
 
 import javax.sql.DataSource;
@@ -16,18 +14,13 @@ import org.mybatis.spring.SqlSessionFactoryBean;
 import org.mybatis.spring.SqlSessionTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
-import org.springframework.jdbc.datasource.lookup.AbstractRoutingDataSource;
 import org.springframework.transaction.PlatformTransactionManager;
 
-import com.alibaba.druid.pool.DruidDataSource;
-import com.company.project.core.common.DataSourceType;
 import com.github.pagehelper.PageHelper;
 
 import tk.mybatis.spring.mapper.MapperScannerConfigurer;
@@ -41,7 +34,6 @@ import tk.mybatis.spring.mapper.MapperScannerConfigurer;
 *
  */
 @Configuration
-@AutoConfigureAfter(DataBaseConfigurer.class)
 public class MybatisConfigurer{
     private static final Logger logger = LoggerFactory.getLogger(MybatisConfigurer.class);
     
@@ -55,10 +47,10 @@ public class MybatisConfigurer{
     * @throws  
     */
     @Bean
-    public SqlSessionFactory sqlSessionFactoryBean(@Qualifier("roundRobinDataSouceProxy")AbstractRoutingDataSource roundRobinDataSouceProxy) throws Exception {
+    public SqlSessionFactory sqlSessionFactoryBean(DataSource dataSource) throws Exception {
         logger.info("--------------------  sqlSessionFactory init ---------------------");
         SqlSessionFactoryBean factory = new SqlSessionFactoryBean();
-        factory.setDataSource(roundRobinDataSouceProxy);
+        factory.setDataSource(dataSource);
         factory.setTypeAliasesPackage(MODEL_PACKAGE);
 
         //配置分页插件，详情请查阅官方文档
@@ -114,42 +106,14 @@ public class MybatisConfigurer{
         properties.setProperty("mappers", MAPPER_INTERFACE_REFERENCE);
         //insert、update是否判断字符串类型!='' 即 test="str != null"表达式内是否追加 and str != ''
         properties.setProperty("notEmpty", "false");
-        properties.setProperty("IDENTITY","SELECT REPLACE(UUID(),''-'','''')");  
+//        properties.setProperty("IDENTITY","SELECT REPLACE(UUID(),''-'','''')");  
         //主键UUID回写方法执行顺序,默认AFTER,可选值为(BEFORE|AFTER)  
-        properties.setProperty("ORDER","BEFORE");  
+//        properties.setProperty("ORDER","BEFORE");  
         mapperScannerConfigurer.setProperties(properties);
 
         return mapperScannerConfigurer;
     }
     
-    /**
-     * 
-    * 把所有数据库都放在路由中
-    * @Title: roundRobinDataSouceProxy  
-    * @param @param dataSourceWrite
-    * @param @param dataSourceRead
-    * @param @return    参数
-    * @return AbstractRoutingDataSource    返回类型  
-    * @throws
-     */
-    @Bean(name="roundRobinDataSouceProxy")
-    public AbstractRoutingDataSource roundRobinDataSouceProxy(
-            @Qualifier("dataSourceWrite") DruidDataSource dataSourceWrite,
-            @Qualifier("dataSourceRead") DruidDataSource dataSourceRead) {
-        
-        Map<Object, Object> targetDataSources = new HashMap<Object, Object>();
-        //把所有数据库都放在targetDataSources中,注意key值要和determineCurrentLookupKey()中代码写的一致，
-        //否则切换数据源时找不到正确的数据源
-        targetDataSources.put(DataSourceType.write.getType(), dataSourceWrite);
-        targetDataSources.put(DataSourceType.read.getType(), dataSourceRead);
-        //路由类，寻找对应的数据源
-        AbstractRoutingDataSource proxy = new RoundRobinRoutingDataSouce(1);
-
-        proxy.setDefaultTargetDataSource(dataSourceWrite);//默认库
-        proxy.setTargetDataSources(targetDataSources);
-        return proxy;
-    }
-
     /**  
     * 事务管理
     * @Title: txManager  
@@ -159,7 +123,7 @@ public class MybatisConfigurer{
     * @throws  
     */
     @Bean
-    public PlatformTransactionManager txManager(@Qualifier("roundRobinDataSouceProxy")DataSource dataSource) {
+    public PlatformTransactionManager txManager(DataSource dataSource) {
       return new DataSourceTransactionManager(dataSource);
   }
 }

@@ -1,8 +1,8 @@
 package com.company.project.web;
 
 import com.company.project.core.common.Result;
-import com.company.project.domain.model.Student;
-import com.company.project.service.StudentService;
+import com.company.project.domain.model.TOrderItem;
+import com.company.project.service.TOrderItemService;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import org.springframework.web.bind.annotation.*;
@@ -12,30 +12,30 @@ import java.util.List;
 
 /**
  *
-* @ClassName: StudentController
+* @ClassName: TOrderItemController
 * @Description: TODO
 * @author duanzhiwei
-* @date 2018年12月20日 AM 11点22分47秒
+* @date 2018年12月20日 PM 05点34分24秒
 *
  */
 @RestController
-@RequestMapping("/student")
-public class StudentController {
+@RequestMapping("/t/order/item")
+public class TOrderItemController {
     @Resource
-    private StudentService studentService;
+    private TOrderItemService tOrderItemService;
 
     /**  
     * 自动生成的新增方法
     * @Title: add  
-    * @param @param student
+    * @param @param tOrderItem
     * @param @return    参数
-    * @return Result<Student>    返回类型  
+    * @return Result<TOrderItem>    返回类型  
     * @throws  
     */
     @PostMapping
-    public Result<Student> add(@RequestBody Student student) {
-        studentService.save(student);
-        return Result.ok(student);
+    public Result<TOrderItem> add(@RequestBody TOrderItem tOrderItem) {
+        tOrderItemService.save(tOrderItem);
+        return Result.ok(tOrderItem);
     }
 
     /**  
@@ -48,22 +48,22 @@ public class StudentController {
     */
     @DeleteMapping("/{id}")
     public Result<String> delete(@PathVariable String id) {
-        studentService.deleteById(id);
+        tOrderItemService.deleteById(id);
         return Result.ok(id);
     }
 
     /**  
     * 自动生成的更新方法
     * @Title: update  
-    * @param @param student
+    * @param @param tOrderItem
     * @param @return    参数
-    * @return Result<Student>    返回类型  
+    * @return Result<TOrderItem>    返回类型  
     * @throws  
     */
     @PutMapping
-    public Result<Student> update(@RequestBody Student student) {
-        studentService.update(student);
-        return Result.ok(student);
+    public Result<TOrderItem> update(@RequestBody TOrderItem tOrderItem) {
+        tOrderItemService.update(tOrderItem);
+        return Result.ok(tOrderItem);
     }
 
     /**  
@@ -71,13 +71,13 @@ public class StudentController {
     * @Title: detail  
     * @param @param id
     * @param @return    参数
-    * @return Result<Student>    返回类型  
+    * @return Result<TOrderItem>    返回类型  
     * @throws  
     */
     @GetMapping("/{id}")
-    public Result<Student> detail(@PathVariable String id) {
-        Student student = studentService.findById(id);
-        return Result.ok(student);
+    public Result<TOrderItem> detail(@PathVariable String id) {
+        TOrderItem tOrderItem = tOrderItemService.findById(id);
+        return Result.ok(tOrderItem);
     }
 
     /**  
@@ -86,14 +86,14 @@ public class StudentController {
     * @param @param page
     * @param @param size
     * @param @return    参数
-    * @return Result<PageInfo<Student>>    返回类型  
+    * @return Result<PageInfo<TOrderItem>>    返回类型  
     * @throws  
     */
     @GetMapping
-    public Result<PageInfo<Student>> list(@RequestParam(defaultValue = "0") Integer page, @RequestParam(defaultValue = "0") Integer size) {
+    public Result<PageInfo<TOrderItem>> list(@RequestParam(defaultValue = "0") Integer page, @RequestParam(defaultValue = "0") Integer size) {
         PageHelper.startPage(page, size);
-        List<Student> list = studentService.findAll();
-        PageInfo<Student> pageInfo = new PageInfo<>(list);
+        List<TOrderItem> list = tOrderItemService.findAll();
+        PageInfo<TOrderItem> pageInfo = new PageInfo<>(list);
         return Result.ok(pageInfo);
     }
 }

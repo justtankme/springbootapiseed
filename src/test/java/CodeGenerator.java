@@ -45,7 +45,7 @@ import freemarker.template.TemplateExceptionHandler;
  */
 public class CodeGenerator {
     //JDBC配置，请修改为你项目的实际配置
-    private static final String JDBC_URL = "jdbc:mysql://localhost:3306/test";
+    private static final String JDBC_URL = "jdbc:mysql://localhost:3306/ds0";
     private static final String JDBC_USERNAME = "root";
     private static final String JDBC_PASSWORD = "root";
     private static final String JDBC_DIVER_CLASS_NAME = "com.mysql.jdbc.Driver";
@@ -69,7 +69,9 @@ public class CodeGenerator {
     private static final String DATE = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy年MM月dd日 a hh点mm分ss秒"));
 
     public static void main(String[] args) {
-        genCode("student","id");
+        genCode("t_config","config_id");
+        genCode("t_order","order_id");
+        genCode("t_order_item","order_id");
         //genCode("输入表名", "输入主键字段名");
         //genCodeByCustomModelName("输入表名","输入自定义Model名称");
     }
