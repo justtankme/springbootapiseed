@@ -27,3 +27,6 @@
 - 将mybatis、pagehelper、generator、freemarker升级到springboot版本。
 - 实现自动生成swagger注解。
 - 优化增加数据源时需要进行的配置操作量
+
+### tips
+- 使用eclipse的，建议在market中安装sts插件
