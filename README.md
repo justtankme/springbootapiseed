@@ -29,4 +29,5 @@
 - 优化增加数据源时需要进行的配置操作量
 
 ### tips
+- src/main/resources/sql目录下是所需的sql脚本
 - 使用eclipse的，建议在market中安装sts插件
