@@ -31,3 +31,5 @@
 ### tips
 - src/main/resources/sql目录下是所需的sql脚本
 - 使用eclipse的，建议在market中安装sts插件
+- swagger页面 http://localhost:8080/quickstart/swagger-ui.html
+- druid页面 http://localhost:8080/quickstart/druid/api.html
