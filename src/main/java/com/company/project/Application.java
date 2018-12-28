@@ -1,8 +1,7 @@
 package com.company.project;
 
+import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.builder.SpringApplicationBuilder;
-import org.springframework.boot.web.support.SpringBootServletInitializer;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 /**  
@@ -14,11 +13,11 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 */
 @SpringBootApplication
 @EnableTransactionManagement(order = 10)
-public class Application extends SpringBootServletInitializer {
-    @Override
-    protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
-        return application.sources(this.getClass());
-    }
+public class Application{
+//    @Override
+//    protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
+//        return application.sources(this.getClass());
+//    }
 
     //	@Value("${token.filter.unauthurl}")
     //	private String unAuthUrl;
@@ -34,6 +33,6 @@ public class Application extends SpringBootServletInitializer {
     //    }
 
     public static void main(String[] args) {
-        new SpringApplicationBuilder(Application.class).web(true).run(args);
+    	SpringApplication.run(Application.class, args);
     }
 }

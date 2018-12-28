@@ -43,7 +43,7 @@ public class RedissonAutoConfiguration {
      * @return
      */
     @Bean
-    @ConfigurationProperties(prefix = "redisson.singleServerConfig")
+    @ConfigurationProperties(prefix = "redisson.single-serverconfig")
     RedissonProperties getRedssionProperties() {
     		return new RedissonProperties();
     }

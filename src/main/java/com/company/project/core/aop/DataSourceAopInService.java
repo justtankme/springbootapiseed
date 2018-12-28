@@ -1,14 +1,15 @@
 package com.company.project.core.aop;
 
 import org.aspectj.lang.JoinPoint;
+import org.aspectj.lang.annotation.After;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
-import com.company.project.core.common.DataSourceType;
+import com.company.project.core.annotation.SpecifiedDataSource;
+import com.company.project.core.common.DataSourceTypeEnum;
 import com.company.project.core.configurer.DataSourceContextHolder;
 
 /**
@@ -22,12 +23,28 @@ import com.company.project.core.configurer.DataSourceContextHolder;
 *
  */
 @Aspect
-//@EnableAspectJAutoProxy(exposeProxy=true,proxyTargetClass=true)
 @Component
 @Order(1)
 public class DataSourceAopInService {
-    private static Logger log = LoggerFactory.getLogger(DataSourceAopInService.class);
 
+    @Pointcut("execution(* com.company.project.service.*.find*(..)) "
+            + "|| execution(* com.company.project.core.common.Service.find*(..)) "
+            + "|| @annotation(com.company.project.core.annotation.ReadDataSource) ")
+    public void readPoint() {
+        
+    }
+    
+    @Pointcut("execution(* com.company.project.service.*.save*(..)) "
+            + "|| execution(* com.company.project.service.*.delete*(..)) "
+            + "|| execution(* com.company.project.service.*.update*(..)) "
+            + "|| execution(* com.company.project.core.common.Service.save*(..)) "
+            + "|| execution(* com.company.project.core.common.Service.delete*(..)) "
+            + "|| execution(* com.company.project.core.common.Service.update*(..)) "
+            + "|| @annotation(com.company.project.core.annotation.WriteDataSource) ")
+    public void writePoint() {
+
+    }
+    
     /**  
     * 读库切面，处理service层的find开头的方法和ReadDataSource注解
     * @Title: setReadDataSourceType  
@@ -35,13 +52,10 @@ public class DataSourceAopInService {
     * @return void    返回类型  
     * @throws  
     */
-    @Before("execution(* com.company.project.service..*.find*(..)) "
-            + "or execution(* com.company.project.core.common.AbstractService.find*(..)) "
-            + " or @annotation(com.company.project.core.annotation.ReadDataSource) ")
+    @Before("readPoint()")
     public void setReadDataSourceType(JoinPoint joinPoint) {
         //如果已经开启写事务了，那之后的所有读都从写库读
-        if (!DataSourceType.write.getType().equals(DataSourceContextHolder.getReadOrWrite())) {
-            log.debug("设置数据源为read");
+        if (!DataSourceTypeEnum.write.getType().equals(DataSourceContextHolder.get())) {
             DataSourceContextHolder.setRead();
         }
     }
@@ -54,15 +68,46 @@ public class DataSourceAopInService {
     * @return void    返回类型  
     * @throws  
     */
-    @Before("execution(* com.company.project.service..*.save*(..)) "
-            + "or execution(* com.company.project.service..*.delete*(..)) "
-            + "or execution(* com.company.project.service..*.update*(..)) "
-            + "or execution(* com.company.project.core.common.AbstractService.save*(..)) "
-            + "or execution(* com.company.project.core.common.AbstractService.delete*(..)) "
-            + "or execution(* com.company.project.core.common.AbstractService.update*(..)) "
-            + " or @annotation(com.company.project.core.annotation.WriteDataSource) ")
+    @Before("writePoint()")
     public void setWriteDataSourceType(JoinPoint joinPoint) {
-        log.debug("设置数据源为write");
         DataSourceContextHolder.setWrite();
+    }
+    
+    /**  
+    * 手动指定任意数据源
+    * @Title: setSpecifiedDataSourceType  
+    * @param @param joinPoint
+    * @param @param specifiedDataSource    参数
+    * @return void    返回类型  
+    * @throws  
+    */
+    @Before("(@annotation(specifiedDataSource))")
+    public void setSpecifiedDataSourceType(JoinPoint joinPoint, SpecifiedDataSource specifiedDataSource) {
+        DataSourceContextHolder.set(specifiedDataSource.dataSourceType());
+    }
+    
+    /**  
+    * 清理本地线程变量防止内存泄漏
+    * @Title: after  
+    * @param @param point    参数
+    * @return void    返回类型  
+    * @throws  
+    */
+    @After("readPoint() || writePoint()")
+    public void after(JoinPoint point) {
+        DataSourceContextHolder.clear();
+    }
+    
+    /**  
+    * 清理本地线程变量防止内存泄漏
+    * @Title: after  
+    * @param @param joinPoint
+    * @param @param specifiedDataSource    参数
+    * @return void    返回类型  
+    * @throws  
+    */
+    @After("(@annotation(specifiedDataSource))")
+    public void after(JoinPoint joinPoint, SpecifiedDataSource specifiedDataSource) {
+        DataSourceContextHolder.clear();
     }
 }

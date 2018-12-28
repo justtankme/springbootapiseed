@@ -2,6 +2,7 @@ package com.company.project.core.configurer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.autoconfigure.quartz.QuartzDataSource;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -31,7 +32,7 @@ public class DataBaseConfigurer {
      */
     @Bean(name = "dataSourceWrite")
     @Primary
-    @ConfigurationProperties("spring.datasource.druid.write")
+    @ConfigurationProperties("spring.datasource.write")
     public DruidDataSource dataSourceWrite() {
         logger.debug("Configuring dataSourceWrite");
         return DruidDataSourceBuilder.create().build();
@@ -45,50 +46,38 @@ public class DataBaseConfigurer {
     * @throws  
     */
     @Bean(name = "dataSourceRead")
-    @ConfigurationProperties("spring.datasource.druid.read")
+    @ConfigurationProperties("spring.datasource.read")
     public DruidDataSource dataSourceRead(){
         logger.debug("Configuring dataSourceRead");
         return DruidDataSourceBuilder.create().build();
     }
-
+    
     /**  
-    * @Title: druidServletRegist  
-    * @Description: druid连接池提供的监控页面servlet
+    * 日志库配置
+    * @Title: dataSourceLog  
     * @param @return    参数
-    * @return ServletRegistrationBean    返回类型  
+    * @return DruidDataSource    返回类型  
     * @throws  
     */
-//    @Bean
-//    public ServletRegistrationBean druidServletRegist() {
-//        ServletRegistrationBean servletRegistrationBean = new ServletRegistrationBean();
-//        servletRegistrationBean.setServlet(new StatViewServlet());
-//        servletRegistrationBean.addUrlMappings("/druid/*");
-//        Map<String, String> initParameters = new HashMap<String, String>(10);
-//        // 用户名
-//        initParameters.put("loginUsername", "admin");
-//        // 密码
-//        initParameters.put("loginPassword", "admin");
-//        // 禁用HTML页面上的“Reset All”功能
-//        initParameters.put("resetEnable", "false");
-//        // IP白名单 (没有配置或者为空，则允许所有访问)
-//        initParameters.put("allow", "");
-//        servletRegistrationBean.setInitParameters(initParameters);
-//        return servletRegistrationBean;
-//    }
-
+    @Bean(name = "dataSourceLog")
+    @ConfigurationProperties("spring.datasource.log")
+    public DruidDataSource dataSourceLog(){
+        logger.debug("Configuring dataSourceLog");
+        return DruidDataSourceBuilder.create().build();
+    }    
+    
     /**  
-    * @Title: webStatFilterRegist  
-    * @Description: druid连接池统计页面需要的过滤器
+    * quartz库配置
+    * @Title: dataSourceQuartz  
     * @param @return    参数
-    * @return FilterRegistrationBean    返回类型  
+    * @return DruidDataSource    返回类型  
     * @throws  
     */
-//    @Bean
-//    public FilterRegistrationBean webStatFilterRegist() {
-//        FilterRegistrationBean filterRegistrationBean = new FilterRegistrationBean();
-//        filterRegistrationBean.setFilter(new WebStatFilter());
-//        filterRegistrationBean.addUrlPatterns("/*");
-//        filterRegistrationBean.addInitParameter("exclusions", "*.js,*.gif,*.jpg,*.png,*.css,*.ico,/druid/*");
-//        return filterRegistrationBean;
-//    }
+    @QuartzDataSource
+    @Bean(name = "dataSourceQuartz")
+    @ConfigurationProperties("spring.datasource.quartz")
+    public DruidDataSource dataSourceQuartz(){
+        logger.debug("Configuring dataSourceQuartz");
+        return DruidDataSourceBuilder.create().build();
+    }
 }

@@ -1,8 +1,8 @@
 package com.company.project.web;
 
 import com.company.project.core.common.Result;
-import com.company.project.domain.model.Student;
-import com.company.project.service.StudentService;
+import com.company.project.domain.model.TUser;
+import com.company.project.service.TUserService;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import org.springframework.web.bind.annotation.*;
@@ -12,30 +12,30 @@ import java.util.List;
 
 /**
  *
-* @ClassName: StudentController
+* @ClassName: TUserController
 * @Description: TODO
 * @author duanzhiwei
-* @date 2018年12月20日 AM 11点22分47秒
+* @date 2018年12月28日 下午 03点07分32秒
 *
  */
 @RestController
-@RequestMapping("/student")
-public class StudentController {
+@RequestMapping("/t/user")
+public class TUserController {
     @Resource
-    private StudentService studentService;
+    private TUserService tUserService;
 
     /**  
     * 自动生成的新增方法
     * @Title: add  
-    * @param @param student
+    * @param @param tUser
     * @param @return    参数
-    * @return Result<Student>    返回类型  
+    * @return Result<TUser>    返回类型  
     * @throws  
     */
     @PostMapping
-    public Result<Student> add(@RequestBody Student student) {
-        studentService.save(student);
-        return Result.ok(student);
+    public Result<TUser> add(@RequestBody TUser tUser) {
+        tUserService.save(tUser);
+        return Result.ok(tUser);
     }
 
     /**  
@@ -48,22 +48,22 @@ public class StudentController {
     */
     @DeleteMapping("/{id}")
     public Result<String> delete(@PathVariable String id) {
-        studentService.deleteById(id);
+        tUserService.deleteById(id);
         return Result.ok(id);
     }
 
     /**  
     * 自动生成的更新方法
     * @Title: update  
-    * @param @param student
+    * @param @param tUser
     * @param @return    参数
-    * @return Result<Student>    返回类型  
+    * @return Result<TUser>    返回类型  
     * @throws  
     */
     @PutMapping
-    public Result<Student> update(@RequestBody Student student) {
-        studentService.update(student);
-        return Result.ok(student);
+    public Result<TUser> update(@RequestBody TUser tUser) {
+        tUserService.update(tUser);
+        return Result.ok(tUser);
     }
 
     /**  
@@ -71,13 +71,13 @@ public class StudentController {
     * @Title: detail  
     * @param @param id
     * @param @return    参数
-    * @return Result<Student>    返回类型  
+    * @return Result<TUser>    返回类型  
     * @throws  
     */
     @GetMapping("/{id}")
-    public Result<Student> detail(@PathVariable String id) {
-        Student student = studentService.findById(id);
-        return Result.ok(student);
+    public Result<TUser> detail(@PathVariable String id) {
+        TUser tUser = tUserService.findById(id);
+        return Result.ok(tUser);
     }
 
     /**  
@@ -86,14 +86,14 @@ public class StudentController {
     * @param @param page
     * @param @param size
     * @param @return    参数
-    * @return Result<PageInfo<Student>>    返回类型  
+    * @return Result<PageInfo<TUser>>    返回类型  
     * @throws  
     */
     @GetMapping
-    public Result<PageInfo<Student>> list(@RequestParam(defaultValue = "0") Integer page, @RequestParam(defaultValue = "0") Integer size) {
+    public Result<PageInfo<TUser>> list(@RequestParam(defaultValue = "0") Integer page, @RequestParam(defaultValue = "0") Integer size) {
         PageHelper.startPage(page, size);
-        List<Student> list = studentService.findAll();
-        PageInfo<Student> pageInfo = new PageInfo<>(list);
+        List<TUser> list = tUserService.findAll();
+        PageInfo<TUser> pageInfo = new PageInfo<>(list);
         return Result.ok(pageInfo);
     }
 }

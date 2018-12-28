@@ -15,7 +15,8 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.alibaba.druid.util.PatternMatcher;
 import com.alibaba.druid.util.ServletPathMatcher;
@@ -31,7 +32,7 @@ import com.company.project.service.TokenService;
 *    
 */
 public class TokenFilter implements Filter{
-	protected static Logger logger = Logger.getLogger(TokenFilter.class);
+	protected static Logger logger = LoggerFactory.getLogger(TokenFilter.class);
 
 	private TokenService tokenService;
 	private String unAuthUrl;

@@ -20,7 +20,7 @@ import com.company.project.core.common.ServiceException;
 public class ThrowExceptionAspect {
     private Logger logger = LoggerFactory.getLogger(ThrowExceptionAspect.class);
     
-    @Around(value = "execution(* com.wiselong.callcenter.web..*.*(..))")
+    @Around(value = "execution(* com.company.project.web..*.*(..))")
     public Object dealExceptionOfController(ProceedingJoinPoint jp) {
         Object res = null;
         try {

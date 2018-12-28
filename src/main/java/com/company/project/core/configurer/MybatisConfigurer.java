@@ -1,9 +1,5 @@
 package com.company.project.core.configurer;
 
-import static com.company.project.core.common.ProjectConstant.MAPPER_INTERFACE_REFERENCE;
-import static com.company.project.core.common.ProjectConstant.MAPPER_PACKAGE;
-import static com.company.project.core.common.ProjectConstant.MODEL_PACKAGE;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -27,7 +23,7 @@ import org.springframework.jdbc.datasource.lookup.AbstractRoutingDataSource;
 import org.springframework.transaction.PlatformTransactionManager;
 
 import com.alibaba.druid.pool.DruidDataSource;
-import com.company.project.core.common.DataSourceType;
+import com.company.project.core.common.DataSourceTypeEnum;
 import com.github.pagehelper.PageHelper;
 
 import tk.mybatis.spring.mapper.MapperScannerConfigurer;
@@ -44,6 +40,38 @@ import tk.mybatis.spring.mapper.MapperScannerConfigurer;
 @AutoConfigureAfter(DataBaseConfigurer.class)
 public class MybatisConfigurer{
     private static final Logger logger = LoggerFactory.getLogger(MybatisConfigurer.class);
+
+    /**
+     * 
+    * 把所有数据库都放在路由中
+    * @Title: roundRobinDataSouceProxy  
+    * @param @param dataSourceWrite
+    * @param @param dataSourceRead
+    * @param @return    参数
+    * @return AbstractRoutingDataSource    返回类型  
+    * @throws
+     */
+    @Bean(name="mainDynamicDataSouce")
+    public AbstractRoutingDataSource mainDynamicDataSouce(
+            @Qualifier("dataSourceWrite") DruidDataSource dataSourceWrite,
+            @Qualifier("dataSourceRead") DruidDataSource dataSourceRead,
+            @Qualifier("dataSourceLog") DruidDataSource dataSourceLog,
+            @Qualifier("dataSourceQuartz") DruidDataSource dataSourceQuartz) {
+        
+        Map<Object, Object> targetDataSources = new HashMap<Object, Object>();
+        //把所有数据库都放在targetDataSources中,注意key值要和determineCurrentLookupKey()中代码写的一致，
+        //否则切换数据源时找不到正确的数据源
+        targetDataSources.put(DataSourceTypeEnum.write.getType(), dataSourceWrite);
+        targetDataSources.put(DataSourceTypeEnum.read.getType(), dataSourceRead);
+        targetDataSources.put(DataSourceTypeEnum.log.getType(), dataSourceLog);
+        targetDataSources.put(DataSourceTypeEnum.quartz.getType(), dataSourceQuartz);
+        //路由类，寻找对应的数据源
+        AbstractRoutingDataSource proxy = new DynamicDataSouce();
+
+        proxy.setDefaultTargetDataSource(dataSourceWrite);//默认库
+        proxy.setTargetDataSources(targetDataSources);
+        return proxy;
+    }
     
     /**  
     * @Title: sqlSessionFactoryBean  
@@ -54,12 +82,12 @@ public class MybatisConfigurer{
     * @return SqlSessionFactory    返回类型  
     * @throws  
     */
-    @Bean
-    public SqlSessionFactory sqlSessionFactoryBean(@Qualifier("roundRobinDataSouceProxy")AbstractRoutingDataSource roundRobinDataSouceProxy) throws Exception {
+    @Bean(name="mainSqlSessionFactoryBean")
+    public SqlSessionFactory mainSqlSessionFactoryBean(@Qualifier("mainDynamicDataSouce")AbstractRoutingDataSource abstractRoutingDataSource) throws Exception {
         logger.info("--------------------  sqlSessionFactory init ---------------------");
         SqlSessionFactoryBean factory = new SqlSessionFactoryBean();
-        factory.setDataSource(roundRobinDataSouceProxy);
-        factory.setTypeAliasesPackage(MODEL_PACKAGE);
+        factory.setDataSource(abstractRoutingDataSource);
+        factory.setTypeAliasesPackage("com.company.project.core.domain,com.company.project.monitor.domain,com.company.project.task.domain");
 
         //配置分页插件，详情请查阅官方文档
         PageHelper pageHelper = new PageHelper();
@@ -79,7 +107,7 @@ public class MybatisConfigurer{
 
         //添加XML目录
         ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
-        factory.setMapperLocations(resolver.getResources("classpath:mapper/*.xml"));
+        factory.setMapperLocations(resolver.getResources("classpath:mapper/*/*.xml"));
         return factory.getObject();
     }
 
@@ -91,8 +119,8 @@ public class MybatisConfigurer{
     * @return SqlSessionTemplate    返回类型  
     * @throws  
     */
-    @Bean
-    public SqlSessionTemplate sqlSessionTemplate(SqlSessionFactory sqlSessionFactory) {
+    @Bean(name="mainSqlSessionTemplate")
+    public SqlSessionTemplate mainSqlSessionTemplate(@Qualifier("mainSqlSessionFactoryBean")SqlSessionFactory sqlSessionFactory) {
         return new SqlSessionTemplate(sqlSessionFactory);
     }
     
@@ -103,51 +131,26 @@ public class MybatisConfigurer{
     * @return MapperScannerConfigurer    返回类型  
     * @throws  
     */
-    @Bean
-    public MapperScannerConfigurer mapperScannerConfigurer() {
+    @Bean(name="mainMapperScannerConfigurer")
+    public MapperScannerConfigurer mainMapperScannerConfigurer() {
         MapperScannerConfigurer mapperScannerConfigurer = new MapperScannerConfigurer();
-        mapperScannerConfigurer.setSqlSessionFactoryBeanName("sqlSessionFactoryBean");
-        mapperScannerConfigurer.setBasePackage(MAPPER_PACKAGE);
+        mapperScannerConfigurer.setSqlSessionFactoryBeanName("mainSqlSessionFactoryBean");
+        mapperScannerConfigurer.setBasePackage("com.company.project.dao");
 
         //配置通用Mapper，详情请查阅官方文档
         Properties properties = new Properties();
-        properties.setProperty("mappers", MAPPER_INTERFACE_REFERENCE);
+        properties.setProperty("mappers", "com.company.project.core.common.Mapper");
         //insert、update是否判断字符串类型!='' 即 test="str != null"表达式内是否追加 and str != ''
         properties.setProperty("notEmpty", "false");
-        properties.setProperty("IDENTITY","SELECT REPLACE(UUID(),''-'','''')");  
-        //主键UUID回写方法执行顺序,默认AFTER,可选值为(BEFORE|AFTER)  
-        properties.setProperty("ORDER","BEFORE");  
+        //自增id回写
+        properties.setProperty("IDENTITY", "MYSQL");
+        //不再使用UUID主键
+//        properties.setProperty("IDENTITY","SELECT REPLACE(UUID(),''-'','''')");  
+//        //主键UUID回写方法执行顺序,默认AFTER,可选值为(BEFORE|AFTER)  
+//        properties.setProperty("ORDER","BEFORE");  
         mapperScannerConfigurer.setProperties(properties);
 
         return mapperScannerConfigurer;
-    }
-    
-    /**
-     * 
-    * 把所有数据库都放在路由中
-    * @Title: roundRobinDataSouceProxy  
-    * @param @param dataSourceWrite
-    * @param @param dataSourceRead
-    * @param @return    参数
-    * @return AbstractRoutingDataSource    返回类型  
-    * @throws
-     */
-    @Bean(name="roundRobinDataSouceProxy")
-    public AbstractRoutingDataSource roundRobinDataSouceProxy(
-            @Qualifier("dataSourceWrite") DruidDataSource dataSourceWrite,
-            @Qualifier("dataSourceRead") DruidDataSource dataSourceRead) {
-        
-        Map<Object, Object> targetDataSources = new HashMap<Object, Object>();
-        //把所有数据库都放在targetDataSources中,注意key值要和determineCurrentLookupKey()中代码写的一致，
-        //否则切换数据源时找不到正确的数据源
-        targetDataSources.put(DataSourceType.write.getType(), dataSourceWrite);
-        targetDataSources.put(DataSourceType.read.getType(), dataSourceRead);
-        //路由类，寻找对应的数据源
-        AbstractRoutingDataSource proxy = new RoundRobinRoutingDataSouce(1);
-
-        proxy.setDefaultTargetDataSource(dataSourceWrite);//默认库
-        proxy.setTargetDataSources(targetDataSources);
-        return proxy;
     }
 
     /**  
@@ -158,8 +161,8 @@ public class MybatisConfigurer{
     * @return PlatformTransactionManager    返回类型  
     * @throws  
     */
-    @Bean
-    public PlatformTransactionManager txManager(@Qualifier("roundRobinDataSouceProxy")DataSource dataSource) {
+    @Bean(name="mainTXManager")
+    public PlatformTransactionManager mainTXManager(@Qualifier("mainDynamicDataSouce")DataSource dataSource) {
       return new DataSourceTransactionManager(dataSource);
   }
 }

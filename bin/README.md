@@ -14,16 +14,7 @@
 - 增加了druid对于spring bean的监控。--这个似乎有配置化的解决方案，先不管
 - 使用redisson进行缓存管理、分布式并发控制。
 
-#### 2018/12/28
-- 升级至springboot 2.1.1.RELEASE
-- 修改项目为jar包项目
-- 升级swagger至2.9.0
-- 使用spring boot新特性集成quartz，参考 `https://www.jianshu.com/p/056281e057b3`
-- 增加对restapi请求的日志记录
-- 增加指定数据源功能，见`SpecifiedDataSource`
-
 ### TODO
 - 对于redis的配置和使用，暂时没有比较完美的方案。
 - 将mybatis、pagehelper、generator、freemarker升级到springboot版本。
 - 实现自动生成swagger注解。
-- 优化增加数据源时需要进行的配置操作量

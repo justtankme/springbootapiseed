@@ -39,7 +39,7 @@ import freemarker.template.TemplateExceptionHandler;
  * 
 * @ClassName: CodeGenerator  
 * @Description: 代码生成器，根据数据表名称生成对应的Model、Mapper、Service、Controller简化开发。
-* @author unknown
+* @author duanzw
 * @date 2018年1月16日 上午10:47:03  
 *
  */
@@ -69,7 +69,7 @@ public class CodeGenerator {
     private static final String DATE = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy年MM月dd日 a hh点mm分ss秒"));
 
     public static void main(String[] args) {
-        genCode("student","id");
+        genCode("t_user","user_id");
         //genCode("输入表名", "输入主键字段名");
         //genCodeByCustomModelName("输入表名","输入自定义Model名称");
     }

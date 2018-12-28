@@ -1,9 +1,6 @@
 package com.company.project.core.configurer;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.company.project.core.common.DataSourceType;
+import com.company.project.core.common.DataSourceTypeEnum;
 
 /**
  * 
@@ -15,13 +12,13 @@ import com.company.project.core.common.DataSourceType;
  */
 public class DataSourceContextHolder {
 
-	private static Logger log = LoggerFactory.getLogger(DataSourceContextHolder.class);
-	
-	//线程本地环境
-	private static final ThreadLocal<String> local = new ThreadLocal<String>();
+    /**
+     * DATASOURCE_TYPE:用线程本地环境变量保存数据源的key
+     */
+    private static final ThreadLocal<String> DATASOURCE_TYPE = new ThreadLocal<String>();
 
     public static ThreadLocal<String> getLocal() {
-        return local;
+        return DATASOURCE_TYPE;
     }
 
     /**
@@ -33,8 +30,7 @@ public class DataSourceContextHolder {
     * @throws
      */
     public static void setRead() {
-        local.set(DataSourceType.read.getType());
-        log.info("数据库切换到读库...");
+        DATASOURCE_TYPE.set(DataSourceTypeEnum.read.getType());
     }
 
     /**
@@ -45,8 +41,18 @@ public class DataSourceContextHolder {
     * @throws
      */
     public static void setWrite() {
-        local.set(DataSourceType.write.getType());
-        log.info("数据库切换到写库...");
+        DATASOURCE_TYPE.set(DataSourceTypeEnum.write.getType());
+    }
+
+    /**  
+    * 数据库切换到指定数据源
+    * @Title: set  
+    * @param @param dataSourceType    参数
+    * @return void    返回类型  
+    * @throws  
+    */
+    public static void set(DataSourceTypeEnum dataSourceType) {
+        DATASOURCE_TYPE.set(dataSourceType.getType());
     }
 
     /**  
@@ -56,11 +62,11 @@ public class DataSourceContextHolder {
     * @return String    返回类型  
     * @throws  
     */
-    public static String getReadOrWrite() {
-        return local.get();
+    public static String get() {
+        return DATASOURCE_TYPE.get();
     }
-    
-    public static void clear(){
-    	local.remove();
+
+    public static void clear() {
+        DATASOURCE_TYPE.remove();
     }
 }
