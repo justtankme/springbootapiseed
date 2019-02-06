@@ -160,7 +160,7 @@
 		<dependency>
 			<groupId>org.mybatis.generator</groupId>
 			<artifactId>mybatis-generator-core</artifactId>
-			<version>1.3.5</version>
+			<version>1.3.7</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -174,9 +174,9 @@
 			<optional>true</optional>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-quartz -->
-		<dependency>
+		<!-- <dependency>
 		    <groupId>org.springframework.boot</groupId>
 		    <artifactId>spring-boot-starter-quartz</artifactId>
-		</dependency>
+		</dependency> -->
 	</dependencies>
 </project>

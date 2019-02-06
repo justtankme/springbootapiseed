@@ -45,10 +45,13 @@ import freemarker.template.TemplateExceptionHandler;
  */
 public class CodeGenerator {
     //JDBC配置，请修改为你项目的实际配置
-    private static final String JDBC_URL = "jdbc:mysql://localhost:3306/test";
+	// https://www.jianshu.com/p/dbeeac29ff27
+	//在连接串中加入nullCatalogMeansCurrent=true，否则会默认去找第一个数据库而不是所指定的数据库
+	//该值在5.1.42中默认是true，而在6.0.6默认为false
+    private static final String JDBC_URL = "jdbc:mysql://localhost:3306/test?useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC&nullCatalogMeansCurrent=true";
     private static final String JDBC_USERNAME = "root";
     private static final String JDBC_PASSWORD = "root";
-    private static final String JDBC_DIVER_CLASS_NAME = "com.mysql.jdbc.Driver";
+    private static final String JDBC_DIVER_CLASS_NAME = "com.mysql.cj.jdbc.Driver";
     //项目在硬盘上的基础路径
     private static final String PROJECT_PATH = System.getProperty("user.dir");
     //模板位置
@@ -69,7 +72,7 @@ public class CodeGenerator {
     private static final String DATE = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy年MM月dd日 a hh点mm分ss秒"));
 
     public static void main(String[] args) {
-        genCode("t_user","user_id");
+        genCode("test_t","test_id");
         //genCode("输入表名", "输入主键字段名");
         //genCodeByCustomModelName("输入表名","输入自定义Model名称");
     }
@@ -147,12 +150,14 @@ public class CodeGenerator {
         context.setJavaClientGeneratorConfiguration(javaClientGeneratorConfiguration);
 
         TableConfiguration tableConfiguration = new TableConfiguration(context);
+//        tableConfiguration.setSchema("test");
+//        tableConfiguration.setCatalog("test");
         tableConfiguration.setTableName(tableName);
         if (StringUtils.isNotEmpty(modelName)) {
             tableConfiguration.setDomainObjectName(modelName);
         }
-        tableConfiguration.setGeneratedKey(new GeneratedKey(pkColumn, "Mysql", true, null));
         context.addTableConfiguration(tableConfiguration);
+        tableConfiguration.setGeneratedKey(new GeneratedKey(pkColumn, "Mysql", true, null));
 
         List<String> warnings;
         MyBatisGenerator generator;
