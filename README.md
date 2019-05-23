@@ -22,6 +22,9 @@
 - 增加对restapi请求的日志记录
 - 增加指定数据源功能，见`SpecifiedDataSource`
 
+#### 2019/05/23
+- 添加通用的注册、登录、权限管理模块
+
 ### TODO
 - 对于redis的配置和使用，暂时没有比较完美的方案。
 - 将mybatis、pagehelper、generator、freemarker升级到springboot版本。
